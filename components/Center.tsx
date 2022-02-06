@@ -83,24 +83,30 @@ const Center = () => {
                     <h1 className='text 2xl pb-3 font-bold md:text-3xl xl:text-5xl'>
                         {playlist?.name}
                     </h1>
-                    <p
-                        dangerouslySetInnerHTML={{
-                            __html: playlist?.description!,
-                        }}
-                        className='hidden md:inline'
-                    />
+                    <p className='hidden md:inline'>
+                        {playlist?.description?.replace(/<[^>]+>/gi, '')}
+                    </p>
 
                     <div className='hidden items-center pt-3 lg:flex'>
                         <img
                             className='h-8 w-8 rounded-full object-cover'
-                            src={playlistOwner?.images?.[0].url}
+                            src={playlistOwner?.images?.[0]?.url}
                         />
                         <p className='pl-3 font-bold'>
                             {playlistOwner?.display_name}
                         </p>
-                        <p className='pl-3 text-gray-400'>
-                            ● {playlist?.followers.total} likes ●{' '}
-                            {playlist?.tracks.total} songs{' '}
+                        {playlist?.followers.total &&
+                        playlist.followers.total > 0 ? (
+                            <p className='pl-1 text-gray-400'>
+                                ● {playlist?.followers.total.toLocaleString()}{' '}
+                                likes
+                            </p>
+                        ) : (
+                            <></>
+                        )}
+
+                        <p className='pl-1 text-gray-400'>
+                            ● {playlist?.tracks.total.toLocaleString()} songs{' '}
                         </p>
                     </div>
                 </div>

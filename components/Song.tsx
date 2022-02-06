@@ -1,6 +1,7 @@
 import { setPriority } from 'os';
 import { HTMLAttributes } from 'react';
 import { useRecoilState } from 'recoil';
+import { playlistState } from '../atoms/playlistAtom';
 import { currentTrackIdState, isPlayingState } from '../atoms/songAtom';
 import useSpotify from '../hooks/useSpotify';
 import { millisToMinutesAndSeconds } from '../lib/time';
@@ -15,13 +16,15 @@ const Song = ({ track, order }: SongProps) => {
     const [currentTrackId, setCurrentTrackId] =
         useRecoilState(currentTrackIdState);
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
+    const playlist = useRecoilState(playlistState);
 
     const playSong = async () => {
         setCurrentTrackId(track.id);
         setIsPlaying(true);
 
         spotifyApi.play({
-            uris: [track.uri],
+            context_uri: playlist?.[0]?.uri!,
+            offset: { position: order },
         });
     };
 
@@ -51,7 +54,9 @@ const Song = ({ track, order }: SongProps) => {
             </div>
 
             <div className='ml-auto flex items-center justify-between md:ml-0'>
-                <p className='hidden w-40 md:inline'>{track.album.name}</p>
+                <p className='hidden w-40 truncate md:inline'>
+                    {track.album.name}
+                </p>
                 <p>{millisToMinutesAndSeconds(track.duration_ms)}</p>
             </div>
         </div>

@@ -23,6 +23,8 @@ const Center = () => {
     const { data: session } = useSession();
     const [color, setColor] = useState<string>();
     const [playlist, setPlaylist] = useRecoilState(playlistState);
+    const [playlistOwner, setPlaylistOwner] =
+        useState<SpotifyApi.UserProfileResponse | null>(null);
     const selectedPlaylist = useRecoilValue(selectedPlaylistState);
 
     useEffect(() => {
@@ -30,14 +32,24 @@ const Center = () => {
     }, [selectedPlaylist]);
 
     useEffect(() => {
+        const updatePlaylistOwner = async () => {
+            if (playlist?.owner.id) {
+            }
+        };
+
         if (selectedPlaylist) {
             spotifyApi
                 .getPlaylist(selectedPlaylist)
                 .then((data) => {
                     setPlaylist(data.body);
+                    spotifyApi.getUser(data.body.owner.id).then((userData) => {
+                        setPlaylistOwner(userData.body);
+                    });
                 })
                 .catch((err) => console.log('Error fetching playlist: ', err));
         }
+
+        updatePlaylistOwner();
     }, [spotifyApi, selectedPlaylist]);
 
     return (
@@ -68,9 +80,29 @@ const Center = () => {
                 />
                 <div>
                     <p>PLAYLIST</p>
-                    <h1 className='text 2xl font-bold md:text-3xl xl:text-5xl'>
+                    <h1 className='text 2xl pb-3 font-bold md:text-3xl xl:text-5xl'>
                         {playlist?.name}
                     </h1>
+                    <p
+                        dangerouslySetInnerHTML={{
+                            __html: playlist?.description!,
+                        }}
+                        className='hidden md:inline'
+                    />
+
+                    <div className='hidden items-center pt-3 lg:flex'>
+                        <img
+                            className='h-8 w-8 rounded-full object-cover'
+                            src={playlistOwner?.images?.[0].url}
+                        />
+                        <p className='pl-3 font-bold'>
+                            {playlistOwner?.display_name}
+                        </p>
+                        <p className='pl-3 text-gray-400'>
+                            ● {playlist?.followers.total} likes ●{' '}
+                            {playlist?.tracks.total} songs{' '}
+                        </p>
+                    </div>
                 </div>
             </section>
 

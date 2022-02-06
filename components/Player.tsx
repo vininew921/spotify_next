@@ -26,7 +26,7 @@ const Player = () => {
     const [currentTrackId, setCurrentTrackId] =
         useRecoilState(currentTrackIdState);
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
-    const [volume, setVolume] = useState(50);
+    const [volume, setVolume] = useState<number | null>(null);
     const songInfo = useSongInfo();
 
     const fetchCurrentSong = (
@@ -40,7 +40,8 @@ const Player = () => {
                 spotifyApi.getMyCurrentPlaybackState().then((data) => {
                     if (updateIsPlaying) setIsPlaying(data.body?.is_playing);
                     if (data.body?.device?.volume_percent) {
-                        setVolume(data.body?.device?.volume_percent);
+                        if (volume)
+                            setVolume(data.body?.device?.volume_percent);
                     }
                 });
             });
@@ -85,7 +86,7 @@ const Player = () => {
     }, [currentTrackId, spotifyApi, session]);
 
     useEffect(() => {
-        if (volume >= 0 && volume <= 100) {
+        if (volume && volume >= 0 && volume <= 100) {
             debouncedAdjustVolume(volume);
         }
     }, [volume]);
@@ -166,7 +167,7 @@ const Player = () => {
                 <input
                     className='w-14 md:w-28'
                     type='range'
-                    value={volume}
+                    value={volume ?? 0}
                     min={0}
                     max={100}
                     step={1}

@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from '@heroicons/react/outline';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
 import { signOut, useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { shuffle } from 'lodash';
@@ -23,6 +23,7 @@ const Center = () => {
     const { data: session } = useSession();
     const [color, setColor] = useState<string>();
     const [playlist, setPlaylist] = useRecoilState(playlistState);
+    const [showProfileOptions, setShowProfileOptions] = useState(false);
     const [playlistOwner, setPlaylistOwner] =
         useState<SpotifyApi.UserProfileResponse | null>(null);
     const selectedPlaylist = useRecoilValue(selectedPlaylistState);
@@ -57,17 +58,28 @@ const Center = () => {
             <header className='absolute top-5 right-8'>
                 <div
                     className='flex cursor-pointer items-center 
-                    space-x-3 rounded-full bg-black p-1 
-                    pr-2 opacity-90 hover:opacity-80'
-                    onClick={() => signOut()}
+                    space-x-3 rounded-full bg-gray-900 p-1 
+                    pr-2 font-bold opacity-90 hover:bg-gray-600'
+                    onClick={() => setShowProfileOptions(!showProfileOptions)}
                 >
                     <img
                         className='h-10 w-10 rounded-full object-cover'
                         src={session?.user.image}
                     />
                     <h2 className='text-white'>{session?.user.name}</h2>
-                    <ChevronDownIcon className='h-5 w-5 text-white' />
+                    {showProfileOptions ? (
+                        <ChevronUpIcon className='h-6 w-6 text-white' />
+                    ) : (
+                        <ChevronDownIcon className='h-6 w-6 text-white' />
+                    )}
                 </div>
+                {showProfileOptions ? (
+                    <div className='mt-2 space-x-3 rounded-md bg-gray-900 p-3 pt-2 font-bold text-white opacity-90 hover:cursor-pointer hover:bg-gray-600'>
+                        <p onClick={() => signOut()}>Logout</p>
+                    </div>
+                ) : (
+                    <></>
+                )}
             </header>
 
             <section
